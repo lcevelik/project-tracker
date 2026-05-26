@@ -1,0 +1,235 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                  String    @id @default(cuid())
+  githubId            String    @unique
+  email               String?   @unique
+  name                String?
+  image               String?
+  encryptedAccessToken String?
+  timezone            String    @default("America/Los_Angeles")
+  digestHour          Int       @default(9)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  accounts            Account[]
+  sessions            Session[]
+  projects            Project[]
+  quickCaptureItems   QuickCaptureItem[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Project {
+  id                  String    @id @default(cuid())
+  userId              String
+  repoOwner           String
+  repoName            String
+  defaultBranch       String    @default("main")
+  projectMdPath       String    @default("PROJECT.md")
+  staleThresholdDays  Int       @default(14)
+  aiFallbackEnabled   Boolean   @default(true)
+  lastSyncedAt        DateTime?
+  group               String?
+  language            String?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks    Task[]
+  releases Release[]
+  goals    Goal[]
+  commitDailies CommitDaily[]
+  syncLogs         SyncLog[]
+  privateNote      PrivateNote?
+  quickCaptureItems QuickCaptureItem[]
+
+  @@unique([userId, repoOwner, repoName])
+}
+
+enum TaskSource {
+  md
+  issue
+  pr
+}
+
+enum TaskStatus {
+  goal
+  todo
+  in_progress
+  blocked
+  done
+}
+
+model Task {
+  id            String     @id @default(cuid())
+  projectId     String
+  source        TaskSource
+  externalId    String?
+  title         String
+  status        TaskStatus @default(todo)
+  rawMarkdown   String?
+  contentHash   String?
+  lineRef       Int?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+
+  project  Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  metadata TaskMetadata?
+
+  @@unique([projectId, source, externalId])
+}
+
+enum Priority {
+  P0
+  P1
+  P2
+  P3
+}
+
+model TaskMetadata {
+  id        String    @id @default(cuid())
+  taskId    String    @unique
+  priority  Priority  @default(P2)
+  dueDate   DateTime?
+  tags      String[]
+  notes     String?
+
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
+
+enum ReleaseSource {
+  github_release
+  md
+  manual
+}
+
+enum ReleaseStatus {
+  planned
+  in_progress
+  released
+}
+
+model Release {
+  id          String        @id @default(cuid())
+  projectId   String
+  source      ReleaseSource
+  name        String
+  status      ReleaseStatus @default(planned)
+  plannedDate DateTime?
+  releasedAt  DateTime?
+  notes       String?
+  githubUrl   String?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+enum GoalStatus {
+  active
+  completed
+  abandoned
+}
+
+model Goal {
+  id          String     @id @default(cuid())
+  projectId   String
+  title       String
+  description String?
+  status      GoalStatus @default(active)
+  targetDate  DateTime?
+  completedAt DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model CommitDaily {
+  id        String   @id @default(cuid())
+  projectId String
+  day       DateTime
+  count     Int
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, day])
+}
+
+model QuickCaptureItem {
+  id                  String    @id @default(cuid())
+  userId              String
+  text                String
+  capturedAt          DateTime  @default(now())
+  assignedToProjectId String?
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project? @relation(fields: [assignedToProjectId], references: [id], onDelete: SetNull)
+}
+
+enum SyncStatus {
+  running
+  success
+  failed
+}
+
+model SyncLog {
+  id          String     @id @default(cuid())
+  projectId   String
+  startedAt   DateTime   @default(now())
+  finishedAt  DateTime?
+  status      SyncStatus @default(running)
+  summaryJson String?
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+model PrivateNote {
+  id        String   @id @default(cuid())
+  projectId String   @unique
+  markdown  String   @default("")
+  updatedAt DateTime @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
