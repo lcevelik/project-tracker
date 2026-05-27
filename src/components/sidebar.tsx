@@ -365,23 +365,8 @@ export function Sidebar({ projects, groups }: SidebarProps) {
                           <span className="truncate flex-1">
                             {project.repoOwner}/{project.repoName}
                           </span>
-                          {project.taskCount > 0 && (
-                            <span
-                              className={cn(
-                                "shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-medium",
-                                isActive
-                                  ? "bg-emerald-500/20 text-emerald-400"
-                                  : "bg-zinc-800 text-zinc-500"
-                              )}
-                            >
-                              {project.taskCount}
-                            </span>
-                          )}
-                          {project.language && (
-                            <span className="shrink-0 text-[10px] text-zinc-600">
-                              {project.language}
-                            </span>
-                          )}
+
+
                         </Link>
                       );
                     })}
