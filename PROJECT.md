@@ -5,6 +5,7 @@
 - [x] Multi-user Kanban dashboard for tracking all Git-based projects from one place (target: 2026-05-26)
 - [x] GitHub OAuth sign-in with repo access (target: 2026-05-26)
 - [x] Automatic PROJECT.md parsing with deterministic markdown parser (target: 2026-05-26)
+- [x] Auto-discover new GitHub repos and sync daily (target: 2026-05-26)
 - [ ] Webhook-driven sync for instant updates (target: 2026-07-01)
 - [ ] Mobile-responsive full editing support (target: 2026-07-15)
 
@@ -27,7 +28,7 @@
 
 ## Done
 
-- [x] Next.js 15 + TypeScript + Tailwind + shadcn/ui scaffold
+- [x] Next.js 16 + TypeScript + Tailwind + shadcn/ui scaffold
 - [x] Prisma schema with full data model (User, Project, Task, TaskMetadata, Release, Goal, CommitDaily, QuickCaptureItem, SyncLog, PrivateNote)
 - [x] GitHub OAuth via NextAuth with custom PrismaAdapter
 - [x] Dashboard layout with sidebar, mobile sidebar, quick capture
@@ -51,6 +52,9 @@
 - [x] Auto-detected repo languages
 - [x] User-defined project groups
 - [x] PROJECT.md template auto-push to all repos
+- [x] Daily discover-and-sync cron — auto-adds new GitHub repos at 6AM
+- [x] HTTP Basic Auth protection (Apache level)
+- [x] 42 repos tracked (all lcevelik/* repos)
 
 ## Blocked
 
@@ -59,14 +63,19 @@
 ## Releases
 
 - v1.0.0 — released 2026-05-26 — Full-featured Project Tracker with Kanban, sync, metadata, quick capture
+- v1.1.0 — released 2026-05-26 — Auto-discover repos, HTTP Basic Auth, sidebar cleanup
 
 ## Notes
 
-- Tech stack: Next.js 15 (App Router) + TypeScript + Tailwind + shadcn/ui + Prisma 7 + PostgreSQL (local) + NextAuth + dnd-kit + Recharts + remark/unified + Anthropic SDK + Resend
-- App runs on port 3004 (3000 taken by Open WebUI)
+- Tech stack: Next.js 16 (App Router) + TypeScript + Tailwind + shadcn/ui + Prisma 7 + PostgreSQL (local) + NextAuth + dnd-kit + Recharts + remark/unified + Anthropic SDK + Resend
+- App runs on port 3006 (standalone next-server, not PM2)
+- Location: /media/server/Storage/www/pt.steadiczech.com/
+- Apache reverse proxy + SSL + HTTP Basic Auth (libor/Videoart.1982)
 - GitHub OAuth app: Client ID Ov23liwCkBcDwJ0fUlGz
-- 36 repos tracked (lcevelik/*, EpicGames excluded)
-- All repos have PROJECT.md pushed with real tasks from README analysis
+- 42 repos tracked (all lcevelik/* personal repos)
+- Daily discover-and-sync cron (job f1f090cd9095) at 6AM
+- All repos have PROJECT.md pushed with real tasks from deep code analysis
 - Kanban is read-only — edit PROJECT.md in repos, then sync
 - Parser uses remark-gfm for checkbox support
 - Content fingerprinting via SHA-256 hash preserves metadata across re-syncs
+- Old /Codebase/projecttracker deleted — single source of truth at /www/pt.steadiczech.com
