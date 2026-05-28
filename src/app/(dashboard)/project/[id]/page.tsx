@@ -9,6 +9,7 @@ import { ReleasesTab } from "./releases";
 import { ActivityTab } from "./activity";
 import { NotesTab } from "./notes";
 import { SettingsTab } from "./settings";
+import { AiExecutionsTab } from "./ai-executions";
 import { SyncButton } from "./sync-button";
 import { SyncLogDisplay } from "@/components/sync-log";
 
@@ -155,6 +156,7 @@ export default async function ProjectPage({ params }: Props) {
           <TabsTrigger value="kanban">Kanban</TabsTrigger>
           <TabsTrigger value="releases">Releases</TabsTrigger>
           <TabsTrigger value="activity">Activity</TabsTrigger>
+          <TabsTrigger value="new">New</TabsTrigger>
           <TabsTrigger value="notes">Notes</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
@@ -174,6 +176,9 @@ export default async function ProjectPage({ params }: Props) {
             tasks={activityTasks}
             goals={serializedGoals}
           />
+        </TabsContent>
+        <TabsContent value="new" className="mt-4">
+          <AiExecutionsTab projectId={project.id} />
         </TabsContent>
         <TabsContent value="notes" className="mt-4">
           <NotesTab
