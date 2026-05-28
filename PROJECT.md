@@ -25,6 +25,7 @@
 - [ ] Add time tracking per task
 - [ ] Add project templates for quick setup
 - [ ] Add Slack/Discord notifications for task changes
+- [x] Add AI task execution feature (v1.2.0) <!-- ai-execute -->
 
 ## Done
 
